@@ -1,0 +1,64 @@
+- name: Install pkgs for Jenkins agent
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install Java, Git, Docker
+      ansible.builtin.apt:
+        name:
+          - openjdk-17-jdk
+          - git
+          - docker.io
+        state: present
+
+    - name: Start and enable Docker
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create jenkins user
+      ansible.builtin.user:
+        name: jenkins
+        state: present
+        create_home: true
+        groups: docker
+        append: yes
+        shell: /bin/bash
+
+    - name: Ensure jenkins home has correct perms
+      ansible.builtin.file:
+        path: /home/jenkins
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: '0755'
+
+    - name: Create .ssh dir for jenkins
+      ansible.builtin.file:
+        path: /home/jenkins/.ssh
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: '0700'
+
+    - name: Set JAVA_HOME and PATH for jenkins user
+      ansible.builtin.blockinfile:
+        path: /home/jenkins/.bashrc
+        create: yes
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+        block: |
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          export PATH=$PATH:$JAVA_HOME/bin
+
+    - name: Add Jenkins master public key to agent
+      ansible.posix.authorized_key:
+        user: jenkins
+        state: present
+        key: "{{ lookup('file', '/media/bebars/New Volume/ITI/Jenkins/deployer-key.pub') }}"

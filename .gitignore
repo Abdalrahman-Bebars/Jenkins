@@ -1,0 +1,46 @@
+# =========================
+# Terraform
+# =========================
+.terraform/
+.terraform.lock.hcl
+
+# Terraform state
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Crash logs
+crash.log
+*.crash
+
+# =========================
+# Credentials & Keys
+# =========================
+*.pem
+*.pub
+*.key
+*.crt
+*.pfx
+*.cer
+*.der
+
+# Custom credentials/config
+conf
+creds
+*.env
+.env.*
+
+# =========================
+# OS / Editor junk
+# =========================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.bak
+*.tmp
+*.log
+
+# VSCode / JetBrains
+.vscode/
+.idea/
